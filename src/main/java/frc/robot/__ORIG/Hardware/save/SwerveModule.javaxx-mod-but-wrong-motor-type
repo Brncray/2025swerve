@@ -1,0 +1,139 @@
+package frc.robot.Hardware;
+
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DigitalInput;
+
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.CANcoder;
+
+
+
+//import com.ctre.phoenix.sensors.CANCoder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+//import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+//import com.ctre.phoenix6.hardware.TalonFX;
+//import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.kauailabs.navx.frc.AHRS;
+
+//import edu.wpi.first.math.controller.PIDController;
+//import edu.wpi.first.math.geometry.Rotation2d;
+//import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.SPI;
+
+
+
+
+
+
+
+public class SwerveModule {
+    private final TalonFX steerMotor;
+    private final TalonFX driveMotor;
+
+    private final PIDController steerController;
+    private final CANcoder angleEncoderCAN;
+
+    private final double KP;
+    private final double KI;
+    private final double KD;
+
+
+//    private final CANSparkMax driveMotorCAN;
+//    private final CANSparkMax angleMotorCAN;
+//    private final CANCoder angleEncoderCAN;
+//    private final PIDController anglePID;
+    private double angleOffset;
+
+
+    //---
+//    final DigitalInput m_forwardLimit = new DigitalInput(0);
+//    final DigitalInput m_reverseLimit = new DigitalInput(1);
+//
+//    final DutyCycleOut m_dutyCycle = new DutyCycleOut(0.0);
+    //---
+
+
+
+
+    public SwerveModule(int STEERID, int DRIVEID, int ENCODERID, double angleOFFSET) {
+        steerMotor = new TalonFX(STEERID);
+        driveMotor = new TalonFX(DRIVEID);
+
+        steerMotor.setNeutralMode(NeutralModeValue.Brake);
+        driveMotor.setNeutralMode(NeutralModeValue.Brake);
+
+
+//        steerMotor.setControl(m_dutyCycle.withOutput(0.5)
+//        .withLimitForwardMotion(m_forwardLimit.get())
+//        .withLimitReverseMotion(m_reverseLimit.get()));
+//        driveMotor.setControl(m_dutyCycle.withOutput(0.5)
+//        .withLimitForwardMotion(m_forwardLimit.get())
+//        .withLimitReverseMotion(m_reverseLimit.get()));
+
+
+
+        KP = 0.006;
+        KI = 0;
+        KD = 0.0001;
+
+        steerController = new PIDController(KP, KI, KD);
+    //  steerController.enableContinuousInput(-180, 180);    // -180 , 180
+        steerController.enableContinuousInput(-Math.PI, Math.PI);
+        angleOffset = angleOFFSET;
+        
+        angleEncoderCAN = new CANcoder(ENCODERID);
+        //angleEncoderCAN.configMagnetOffset(OFFSET);
+        //angleEncoderCAN.setPositionToAbsolute();
+    }
+
+    public void setConstants(double KP, double KI, double KD) {
+        steerController.setP(KP);
+        steerController.setI(KI);
+        steerController.setD(KD);
+    }
+
+    public void setModuleState(SwerveModuleState state) {
+       
+        SwerveModuleState optimizedState = SwerveModuleState.optimize(state, getCurrentAngle());
+
+        driveMotor.set(optimizedState.speedMetersPerSecond / 1 );  //Constants.MAX_SPEED); // Adjust Constants.MAX_SPEED
+        double targetAngle = optimizedState.angle.getRadians();
+        double currentAngle = getCurrentAngle().getRadians();
+        double pidOutput = steerController.calculate(currentAngle, targetAngle);
+        steerMotor.set(pidOutput);
+
+        SmartDashboard.putNumber("Module Angle", currentAngle);
+        SmartDashboard.putNumber("Module Target Angle", targetAngle);
+        SmartDashboard.putNumber("Module Speed", optimizedState.speedMetersPerSecond);
+    }
+
+    private Rotation2d getCurrentAngle() {
+         return Rotation2d.fromRadians(Math.toRadians(angleEncoderCAN.getPosition().getValueAsDouble() - angleOffset));
+    }
+
+    public void resetToAbsolute() {
+        angleOffset = angleEncoderCAN.getPosition().getValueAsDouble();
+    }
+
+
+    public void setSteerAngle(double angle) {        
+       // double output = steerController.calculate(angleEncoderCAN.getPosition(), angle);
+        steerMotor.set(angle);
+    }
+
+    public void setDriveSpeed(double speed) {
+        driveMotor.set(speed);
+    }
+}

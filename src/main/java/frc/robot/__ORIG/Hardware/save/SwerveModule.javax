@@ -1,0 +1,73 @@
+package frc.robot.Hardware;
+
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DigitalInput;
+
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.CANcoder;
+
+public class SwerveModule {
+    private final TalonFX steerMotor;
+    private final TalonFX driveMotor;
+
+    private final PIDController steerController;
+    private final CANcoder encoder;
+
+    private final double KP;
+    private final double KI;
+    private final double KD;
+
+    //---
+//    final DigitalInput m_forwardLimit = new DigitalInput(0);
+//    final DigitalInput m_reverseLimit = new DigitalInput(1);
+//
+//    final DutyCycleOut m_dutyCycle = new DutyCycleOut(0.0);
+    //---
+
+
+    public SwerveModule(int STEERID, int DRIVEID, int ENCODERID, double OFFSET) {
+        steerMotor = new TalonFX(STEERID);
+        driveMotor = new TalonFX(DRIVEID);
+
+        steerMotor.setNeutralMode(NeutralModeValue.Brake);
+        driveMotor.setNeutralMode(NeutralModeValue.Brake);
+
+
+//        steerMotor.setControl(m_dutyCycle.withOutput(0.5)
+//        .withLimitForwardMotion(m_forwardLimit.get())
+//        .withLimitReverseMotion(m_reverseLimit.get()));
+//        driveMotor.setControl(m_dutyCycle.withOutput(0.5)
+//        .withLimitForwardMotion(m_forwardLimit.get())
+//        .withLimitReverseMotion(m_reverseLimit.get()));
+
+
+
+        KP = 0.006;
+        KI = 0;
+        KD = 0.0001;
+
+        steerController = new PIDController(KP, KI, KD);
+        steerController.enableContinuousInput(-180, 180);    // -180 , 180 
+        encoder = new CANcoder(ENCODERID);
+        //encoder.configMagnetOffset(OFFSET);
+        //encoder.setPositionToAbsolute();
+    }
+
+    public void setConstants(double KP, double KI, double KD) {
+        steerController.setP(KP);
+        steerController.setI(KI);
+        steerController.setD(KD);
+    }
+
+    public void setSteerAngle(double angle) {        
+       // double output = steerController.calculate(encoder.getPosition(), angle);
+        steerMotor.set(angle);
+    }
+
+    public void setDriveSpeed(double speed) {
+        driveMotor.set(speed);
+    }
+}

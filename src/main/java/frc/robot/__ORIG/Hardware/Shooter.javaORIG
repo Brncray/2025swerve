@@ -1,0 +1,49 @@
+/*package frc.robot.Hardware;
+
+import com.revrobotics.CANSparkMax;
+
+import edu.wpi.first.math.controller.PIDController;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+public class Shooter {
+
+    private final CANSparkMax shooter;
+    private final CANSparkMax angle;
+
+    private final PIDController angleController;
+
+   // private double KP;
+   // private double KI;
+   // private double KD;
+
+    private final int ampAngleTicks;
+
+    public Shooter() {
+    
+        shooter = new CANSparkMax(2, CANSparkMax.MotorType.kBrushless); 
+        angle = new CANSparkMax(1, CANSparkMax.MotorType.kBrushless);
+
+        shooter.restoreFactoryDefaults();
+        angle.restoreFactoryDefaults();
+
+       // KP = 0.1;
+       // KI = 0;
+       // KD = 0;
+
+        ampAngleTicks = 500;
+
+        angleController = new PIDController(0, 0, 0);
+    }
+
+    public double getPIDOutput() {
+        return angleController.calculate(angle.getAbsoluteEncoder().getPosition(), ampAngleTicks);
+    }
+
+    public void setShooterSpeed(double speed) {
+        shooter.set(speed * 0.25);
+    }
+
+    public void setAngleSpeed(double speed) {
+        angle.set(-speed * 0.27314159265358979323);
+    }
+}/* */

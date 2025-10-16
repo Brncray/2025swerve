@@ -1,0 +1,199 @@
+package frc.robot.Hardware;
+
+//import com.kauailabs.navx.frc.AHRS;
+//import edu.wpi.first.wpilibj.SPI;
+
+public class SwerveChassis {
+    private final SwerveModule frontLeft;
+    private final SwerveModule frontRight;
+    private final SwerveModule backLeft;
+    private final SwerveModule backRight;
+
+    //private final AHRS gyro;
+
+    private final double L;
+    private final double W;
+    private final double radius;
+
+    public SwerveChassis() {
+        frontLeft  = new SwerveModule(1, 11, 21, 65.830);
+        frontRight = new SwerveModule(2, 12, 22, 112.852);
+        backRight  = new SwerveModule(3, 13, 23, 180.352);
+        backLeft   = new SwerveModule(4, 14, 24, 109.248);
+ 
+        L = 25.5 ;  // 19.5;
+        W = 24.5;   // 20.0;
+        radius = Math.sqrt((L * L) + (W * W));
+
+       // gyro = new AHRS(SPI.Port.kMXP);
+    }
+
+    public void setDriveSpeeds(double x, double y, double r) {
+        //double heading = Math.toRadians(gyro.getYaw());
+
+        // x = (x * Math.cos(heading)) - (y * Math.sin(heading));
+        // y = (x * Math.sin(heading)) + (y * Math.cos(heading));
+/*
+        if (Math.abs(x) < 0.01) { x = 0; }
+        if (Math.abs(y) < 0.01) { y = 0; }
+        if (Math.abs(r) < 0.01) { r = 0; }
+
+        double a = y - r * (L / radius);
+        double b = y + r * (L / radius);
+        double c = x - r * (W / radius);
+        double d = x + r * (W / radius);
+
+        double frontLeftSpeed  = Math.sqrt((b * b) + (c * c)) ;
+        double frontRightSpeed = Math.sqrt((b * b) + (d * d)) ;
+        double backLeftSpeed   = Math.sqrt((a * a) + (c * c)) ;
+        double backRightSpeed  = Math.sqrt((a * a) + (d * d)) ;
+*/
+        double hypot = Math.sqrt( Math.pow(x, 2) + Math.pow(y, 2) ) ;
+        if( hypot > 0.75 )  { hypot = 0.75 ; } 
+
+        double frontLeftSpeed  = hypot ;
+        double frontRightSpeed = hypot ;
+        double backLeftSpeed   = hypot ;
+        double backRightSpeed  = hypot ;
+
+        double frontLeftAngle  = Math.asin( y / hypot ) /* radians */ ;   // ( Math.asin( x / Math.sqrt( Math.pow(x, 2) + Math.pow(y, 2) ))) ;   // ( Math.atan2(b, c) / Math.PI )   * 180) - 45  );
+        double frontRightAngle = Math.asin( y / hypot ) /* radians */ ;   // ( Math.asin( x / Math.sqrt( Math.pow(x, 2) + Math.pow(y, 2) ))) ;   // ( Math.atan2(b, d) / Math.PI )   * 180) + 45  );
+        double backLeftAngle   = Math.asin( y / hypot ) /* radians */ ;   // ( Math.asin( x / Math.sqrt( Math.pow(x, 2) + Math.pow(y, 2) ))) ;   // ( Math.atan2(a, c) / Math.PI )   * 180) - 180 );
+        double backRightAngle  = Math.asin( y / hypot ) /* radians */ ;   // ( Math.asin( x / Math.sqrt( Math.pow(x, 2) + Math.pow(y, 2) ))) ;   // ( Math.atan2(a, d) / Math.PI )   * 180) + 180 );
+
+        System.out.println("radius: " + radius ) ;
+/*      System.out.println("a: " + a ) ;
+        System.out.println("b: " + b ) ;
+        System.out.println("c: " + c ) ;
+        System.out.println("d: " + d ) ;  */
+        System.out.println("FL  Speed: " + frontLeftSpeed  + "   Angle: " + frontLeftAngle  ) ;
+        System.out.println("FR  Speed: " + frontRightSpeed + "   Angle: " + frontRightAngle ) ;
+        System.out.println("BL  Speed: " + backLeftSpeed   + "   Angle: " + backLeftAngle   ) ;
+        System.out.println("BR  Speed: " + backRightSpeed  + "   Angle: " + backRightAngle  ) ;
+
+
+
+frontLeftSpeed  *= 0.05 ;
+frontRightSpeed *= 0.05 ;
+backLeftSpeed   *= 0.05 ;
+backRightSpeed  *= 0.05 ;
+
+frontLeftAngle  *= 0.05 ;
+frontRightAngle *= 0.05 ;
+backLeftAngle   *= 0.05 ;
+backRightAngle  *= 0.05 ;
+
+
+
+        frontLeft.setDriveSpeed( frontLeftSpeed );
+        frontRight.setDriveSpeed(frontRightSpeed);
+        backLeft.setDriveSpeed(  backLeftSpeed  );
+        backRight.setDriveSpeed( backRightSpeed );
+
+        frontLeft.setSteerAngle( frontLeftAngle );
+        frontRight.setSteerAngle(frontRightAngle);
+        backLeft.setSteerAngle(  backLeftAngle  );
+        backRight.setSteerAngle( backRightAngle );
+
+     //   System.out.println("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz") ;
+    }
+}
+
+/*
+ x: -1.0   y: 0.007874015718698502   r: -0.0 
+ x: -1.0   y: 0.003149899201447782   r: -0.0 
+ x: -0.8   y: 0.0025199193611582255   r: -0.0 
+ Speed: 0.04000000000000001   Angle: -1.5707963267948966 
+ 
+ 
+ 
+ 
+﻿﻿﻿﻿﻿﻿ 1- x: 0.29133859276771545   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ 2- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ abs(y): 1.0   threshold: 0.0099999999   <t/f: false ﻿
+﻿﻿﻿﻿﻿﻿ 3- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ 4- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ radius: 35.36240942017385 ﻿
+﻿﻿﻿﻿﻿﻿ a: -1.0 ﻿
+﻿﻿﻿﻿﻿﻿ b: -1.0 ﻿
+﻿﻿﻿﻿﻿﻿ c: 0.291 ﻿
+﻿﻿﻿﻿﻿﻿ d: 0.291 ﻿
+﻿﻿﻿﻿﻿﻿ FL  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ FR  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ BL  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ BR  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿  ﻿
+﻿﻿﻿﻿﻿﻿ 1- x: 0.29133859276771545   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ 2- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ abs(y): 1.0   threshold: 0.0099999999   <t/f: false ﻿
+﻿﻿﻿﻿﻿﻿ 3- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ 4- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ radius: 35.36240942017385 ﻿
+﻿﻿﻿﻿﻿﻿ a: -1.0 ﻿
+﻿﻿﻿﻿﻿﻿ b: -1.0 ﻿
+﻿﻿﻿﻿﻿﻿ c: 0.291 ﻿
+﻿﻿﻿﻿﻿﻿ d: 0.291 ﻿
+﻿﻿﻿﻿﻿﻿ FL  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ FR  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ BL  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ BR  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿  ﻿
+﻿﻿﻿﻿﻿﻿ 1- x: 0.29133859276771545   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ 2- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ abs(y): 1.0   threshold: 0.0099999999   <t/f: false ﻿
+﻿﻿﻿﻿﻿﻿ 3- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ 4- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ radius: 35.36240942017385 ﻿
+﻿﻿﻿﻿﻿﻿ a: -1.0 ﻿
+﻿﻿﻿﻿﻿﻿ b: -1.0 ﻿
+﻿﻿﻿﻿﻿﻿ c: 0.291 ﻿
+﻿﻿﻿﻿﻿﻿ d: 0.291 ﻿
+﻿﻿﻿﻿﻿﻿ FL  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ FR  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ BL  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ BR  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿  ﻿
+﻿﻿﻿﻿﻿﻿ 1- x: 0.29133859276771545   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ 2- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ abs(y): 1.0   threshold: 0.0099999999   <t/f: false ﻿
+﻿﻿﻿﻿﻿﻿ 3- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ 4- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ radius: 35.36240942017385 ﻿
+﻿﻿﻿﻿﻿﻿ a: -1.0 ﻿
+﻿﻿﻿﻿﻿﻿ b: -1.0 ﻿
+﻿﻿﻿﻿﻿﻿ c: 0.291 ﻿
+﻿﻿﻿﻿﻿﻿ d: 0.291 ﻿
+﻿﻿﻿﻿﻿﻿ FL  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ FR  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ BL  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ BR  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿  ﻿
+﻿﻿﻿﻿﻿﻿ 1- x: 0.29133859276771545   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ 2- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ abs(y): 1.0   threshold: 0.0099999999   <t/f: false ﻿
+﻿﻿﻿﻿﻿﻿ 3- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ 4- x: 0.291   y: -1.0   r: 0.0 ﻿
+﻿﻿﻿﻿﻿﻿ radius: 35.36240942017385 ﻿
+﻿﻿﻿﻿﻿﻿ a: -1.0 ﻿
+﻿﻿﻿﻿﻿﻿ b: -1.0 ﻿
+﻿﻿﻿﻿﻿﻿ c: 0.291 ﻿
+﻿﻿﻿﻿﻿﻿ d: 0.291 ﻿
+﻿﻿﻿﻿﻿﻿ FL  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ FR  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ BL  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+﻿﻿﻿﻿﻿﻿ BR  Speed: 1.04148019664322   Angle: -0.4098611340200693 ﻿
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ */
