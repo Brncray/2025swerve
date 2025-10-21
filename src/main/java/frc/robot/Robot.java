@@ -71,9 +71,13 @@ public class Robot extends TimedRobot {
   }
 
   /** This function is called periodically during autonomous. */
+  // runs approx. every 20 ms
+  // does not use driver input 
   @Override
   public void autonomousPeriodic() {}
 
+  // This function is called once each time the robot enters teleoperated mode.
+  
   @Override
   public void teleopInit() {
     // This makes sure that the autonomous stops running when
@@ -86,18 +90,24 @@ public class Robot extends TimedRobot {
   }
 
   /** This function is called periodically during operator control. */
+  // every 20ms
   @Override
   public void teleopPeriodic() {
 
+    // Get driver's joystick values
     double  x  =  m_robotContainer.driver.getRawAxis(0);
     double  y  =  m_robotContainer.driver.getRawAxis(1);
     double  r  =  m_robotContainer.driver.getRawAxis(4);
+
+    // Reset button status
     boolean Reset =  m_robotContainer.driver.getRawButton(7);   // mall Back button left of Logitech
 
     System.out.println("" ) ;
+    // Debug output in console
     System.out.println("1- x: " + x + "   y: " + y + "   r: " + r + "   Reset: " + Reset ) ;
 
     // import frc.robot.Hardware.SwerveChassis;
+    // Resets the robot heading to zero when Reset button is pressed
     if ( Reset )  m_robotContainer.s_Swerve.zeroHeading() ;  //   zeroHeading()  angleMotor.setPosition(0);  // swerveChassis.resetEncoders() ;
     
 /*  THIS WAS WORKING, THEN NOT...

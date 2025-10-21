@@ -61,6 +61,8 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
+        // When (Y) is pressed, zero the gyro.
+        // InstandCommand is used to run a command ONCE
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
     }
 
